@@ -1,65 +1,10 @@
-// Database class for IndexedDB operations using Dexie.js style interface
-class Database {
-  private db: IDBDatabase | null = null
-  private readonly dbName = 'GeminiTimeTracker'
-  private readonly version = 1
-
-  constructor() {
-    this.init()
-  }
-
-  private init(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, this.version)
-      
-      request.onerror = () => reject(request.error)
-      request.onsuccess = () => {
-        this.db = request.result
-        resolve()
-      }
-      
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
-        if (!db.objectStoreNames.contains('visits')) {
-          const store = db.createObjectStore('visits', { keyPath: 'id', autoIncrement: true })
-          store.createIndex('url', 'url', { unique: false })
-          store.createIndex('domain', 'domain', { unique: false })
-          store.createIndex('startTime', 'startTime', { unique: false })
-        }
-      }
-    })
-  }
-
-  async addVisit(visit: Omit<Visit, 'id'>): Promise<number> {
-    if (!this.db) await this.init()
-    
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(['visits'], 'readwrite')
-      const store = transaction.objectStore('visits')
-      const request = store.add(visit)
-      
-      request.onsuccess = () => resolve(request.result as number)
-      request.onerror = () => reject(request.error)
-    })
-  }
-}
-
-interface Visit {
-  id?: number
-  url: string
-  domain: string
-  startTime: number
-  endTime: number
-  duration: number
-}
+import { db } from '../db/database'
 
 interface TabState {
   startTime: number
   url: string
   domain: string
 }
-
-const db = new Database()
 const tabStates: Record<number, TabState> = {}
 let activeTabId: number | null = null
 let isActive = true

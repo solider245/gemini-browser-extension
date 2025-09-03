@@ -9,11 +9,12 @@ export default defineConfig({
         'popup/index': resolve(__dirname, 'src/popup/index.html'),
         'options/index': resolve(__dirname, 'src/options/index.html'),
         'background/main': resolve(__dirname, 'src/background/main.ts'),
-      },
+          },
       output: {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].js',
         assetFileNames: '[name].[ext]',
+        format: 'es',
       },
     },
   },
@@ -21,5 +22,11 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
     },
+  },
+  define: {
+    global: 'globalThis',
+  },
+  optimizeDeps: {
+    include: ['dexie'],
   },
 })

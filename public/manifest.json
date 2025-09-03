@@ -9,7 +9,8 @@
     "activeTab"
   ],
   "background": {
-    "service_worker": "background/main.ts"
+    "service_worker": "background/main.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup/index.html",
